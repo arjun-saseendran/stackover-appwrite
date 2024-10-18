@@ -27,3 +27,24 @@ interface IAuthStore {
   ): Promise<{ success: boolean; error?: AppwriteException | null }>;
   logout(): Promise<void>
 }
+
+export const useAuthStore = create<IAuthStore>()(
+    persist(
+        immer((set)=>({
+            session: null,
+            jwt: null,
+            user: null,
+            hydrated: false,
+            setHydrated(){
+                set({hydrated: false})
+            }
+        })),{
+        name: 'auth',
+        onRehydrateStorage(){
+            return (state, error) => {
+                if(!error) {state?.setHydrated()}
+            }
+        }
+    }
+    )
+)
