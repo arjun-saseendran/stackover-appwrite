@@ -36,8 +36,48 @@ export const useAuthStore = create<IAuthStore>()(
             user: null,
             hydrated: false,
             setHydrated(){
-                set({hydrated: false})
-            }
+                set({hydrated: true})
+            },
+
+            async verifySession(){
+                try {
+
+                    const session = await account.getSession('current')
+                    set({session})
+                    
+                } catch (error) {
+                    console.log(error);
+                    
+                    
+                }
+            },
+            async login(email, password){
+                try {
+                    const session = await account.createEmailPasswordSession(email, password)
+                    const [user, {jwt}] = await Promise.all([
+                        account.get<UserPrefs>(),
+                        account.createJWT()
+
+                    ])
+
+                    if(!user.prefs?.reputation) await account.updatePrefs<UserPrefs>({reputation: 0})
+                        set({session, user, jwt})
+
+                    
+                } catch (error) {
+                    console.log(error);
+                    return {
+                        success: false,
+                        error: error instanceof AppwriteException ? error : null
+                    }
+                    
+                    
+                    
+                }
+            },
+            async createAccount(name, email, password){},
+            async logout(){}
+
         })),{
         name: 'auth',
         onRehydrateStorage(){
