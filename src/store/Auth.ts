@@ -12,5 +12,12 @@ export interface UserPrefs{
 
 interface IAuthStore{
     session: Models.Session | null
-    jwt: 
+    jwt: string | null
+    user: Models.User<UserPrefs> | null
+    hydrated: boolean
+
+    setHydrated(): void;
+    verifySession(): Promise<void>;
+    login(email: string, password: string): Promise<{success: boolean; error?: AppwriteException | null}>
+
 }
